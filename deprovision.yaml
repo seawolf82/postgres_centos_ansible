@@ -1,0 +1,6 @@
+- name: Terminate running Postgres and remove all files
+  hosts: db-servers
+  remote_user: root
+  roles:
+    - postgres_uninstall
+
