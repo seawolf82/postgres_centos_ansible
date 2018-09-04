@@ -4,44 +4,53 @@
   systemd:
     name: postgresql-10
     enabled: false
+  tags: postgres
 
 - name: Make sure postgres service is stopped
   systemd:
     state: stopped
     name: postgresql-10
+  tags: postgres
 
 
 - name: remove postgresql10-server package
   yum:
     name: postgresql10-server
     state: absent
+  tags: postgres
 
 - name: remove postgresql10-contrib package
   yum:
     name: postgresql10-contrib
     state: absent
+  tags: postgres
 
 
 - name: remove postgresql10 package
   yum:
     name: postgresql10
     state: absent
+  tags: postgres
 
 - name: remove postgresql10-odbc package
   yum:
     name: postgresql10-odbc
     state: absent
+  tags: postgres
 
 - name: Remove directory pgsql in /var/lib
   file:
     state: absent
     path: /var/lib/pgsql
+  tags: postgres
 
 
 - name: remove postgres repository 
   yum: name=pgdg-centos10-10-2.noarch.rpm state=absent
+  tags: postgres
 
 
 - name: removing firewall rules for postgres service
   command: firewall-cmd --remove-service=postgresql --permanent
   notify: Reloading firewalld rules
+  tags: postgres
