@@ -36,7 +36,7 @@
 - name: adding firewall rules for postgres service
   command: firewall-cmd --add-service=postgresql --permanent
   notify: Reloading firewalld rules
-
+  tags: postgres
 
 - name: Configure host based authentication.
   copy:
@@ -45,7 +45,7 @@
     owner: "{{postgresql_user}}"
     group: "{{postgresql_group}}"
     mode: 0600
-
+  tags: postgres
 
 
 - name: Copy modified postgresql.conf to allow connection from external.
@@ -55,9 +55,10 @@
     owner: "{{postgresql_user}}"
     group: "{{postgresql_group}}"
     mode: 0600
-
+  tags: postgres
 
 - name: Restart postgres service
   systemd:
     state: restarted
     name: postgresql-10
+  tags: postgres
