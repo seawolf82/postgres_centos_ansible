@@ -5,6 +5,7 @@
   yum:
     name: "*"
     state: latest
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7" 
   tags: upgrade
 
 - name: ensure a list of packages installed
@@ -20,6 +21,31 @@
     - bzip2
     - gzip
     - net-tools
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7" 
+  tags: package
+
+
+- name: upgrade all packages 
+  dnf:
+    name: "*"
+    state: latest
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: upgrade
+
+- name: ensure a list of packages installed
+  dnf:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - wget
+    - curl
+    - bash-completion
+    - vim
+    - zip
+    - bzip2
+    - gzip
+    - net-tools
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
   tags: package
 
 - name: Install epel package
