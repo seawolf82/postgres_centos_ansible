@@ -16,7 +16,7 @@ To install postgresql on Redhat based Distributions run:
 
 ansible-playbook -i hosts site.yaml
 
-To uninstall postgresql on centos7 run:
+To uninstall postgresql on Redhat based Distributions run:
 
 ansible-playbook -i hosts deprovision.yaml
 
