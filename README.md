@@ -1,14 +1,22 @@
 # postgres_centos_ansible
 
 
-This script install on centos7 postgresql 10
+This script install on postgresql on Redhat based Distributions.
+
+Tested on:
+
+Almalinux 8
+Almalinux 9
+RockyLinux 8
+RockyLinux 9
+Centos 7
 
 
-To install postgresql 10 on centos7 run:
+To install postgresql on Redhat based Distributions run:
 
 ansible-playbook -i hosts site.yaml
 
-To uninstall postgresql 10 on centos7 run:
+To uninstall postgresql on centos7 run:
 
 ansible-playbook -i hosts deprovision.yaml
 
