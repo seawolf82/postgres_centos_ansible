@@ -13,7 +13,7 @@ Tested on:
 
 Tested on:
 
-2.9 Ansible version
+- 2.9 Ansible version
 
 
 To use postgresql_user you need to install community.postgresql from ansible-galaxy
