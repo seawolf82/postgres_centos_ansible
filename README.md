@@ -5,11 +5,11 @@ This script install on postgresql on Redhat based Distributions.
 
 Tested on:
 
-Almalinux 8
-Almalinux 9
-RockyLinux 8
-RockyLinux 9
-Centos 7
+- Almalinux 8
+- Almalinux 9
+- RockyLinux 8
+- RockyLinux 9
+- Centos 7
 
 
 To install postgresql on Redhat based Distributions run:
