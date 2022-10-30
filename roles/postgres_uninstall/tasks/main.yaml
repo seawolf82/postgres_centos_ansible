@@ -2,55 +2,103 @@
 
 - name: disable postgres service
   systemd:
-    name: postgresql-10
+    name: postgresql-15
     enabled: false
+  when: false
   tags: postgres
 
 - name: Make sure postgres service is stopped
   systemd:
     state: stopped
-    name: postgresql-10
+    name: postgresql-15
+  when: false
   tags: postgres
 
 
-- name: remove postgresql10-server package
+- name: ensure a list of postgres packages removed Centos 7
   yum:
-    name: postgresql10-server
+    name: postgresql15-server
     state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") 
   tags: postgres
 
-- name: remove postgresql10-contrib package
+- name: ensure a list of postgres packages removed Centos 7
   yum:
-    name: postgresql10-contrib
+    name: postgresql15-contrib
     state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") 
   tags: postgres
 
-
-- name: remove postgresql10 package
+- name: ensure a list of postgres packages removed Centos 7
   yum:
-    name: postgresql10
+    name: postgresql15-libs
     state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") 
   tags: postgres
 
-- name: remove postgresql10-odbc package
+- name: ensure a list of postgres packages removed Centos 7
   yum:
-    name: postgresql10-odbc
+    name: postgresql15-odbc
     state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") 
   tags: postgres
 
-- name: Remove directory pgsql in /var/lib
+
+# For Almalinux 8 and 9 / Rocky Linux 8 and 9
+
+
+- name: ensure a list of postgres packages removed 
+  dnf:
+    name: postgresql15-server
+    state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: postgres
+
+- name: ensure a list of postgres packages removed 
+  dnf:
+    name: postgresql15-contrib
+    state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: postgres
+
+- name: ensure a list of postgres packages removed 
+  dnf:
+    name: postgresql15-libs
+    state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: postgres
+
+- name: ensure a list of postgres packages removed 
+  dnf:
+    name: postgresql15-odbc
+    state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: postgres
+
+
+- name: ensure a package for postgres repo is removed (EL 7)
+  dnf:
+    name: pgdg-redhat-repo
+    state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") 
+  tags: postgres
+
+- name: ensure a package for postgres repo is removed (EL 8 or EL 9)
+  dnf:
+    name: pgdg-redhat-repo
+    state: absent
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: postgres
+
+
+- name: Remove directory pgsql from /var/lib
   file:
     state: absent
     path: /var/lib/pgsql
   tags: postgres
 
-
-- name: remove postgres repository 
-  yum: name=pgdg-centos10-10-2.noarch.rpm state=absent
-  tags: postgres
-
-
 - name: removing firewall rules for postgres service
   command: firewall-cmd --remove-service=postgresql --permanent
   notify: Reloading firewalld rules
   tags: postgres
+

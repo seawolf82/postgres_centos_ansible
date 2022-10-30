@@ -3,4 +3,4 @@
   command: firewall-cmd --reload
 
 - name: Restart Postgres Database
-  command: systemctl restart postgresql-10
+  command: systemctl restart postgresql-15

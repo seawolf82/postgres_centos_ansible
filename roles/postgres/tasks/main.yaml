@@ -1,37 +1,98 @@
 ---
 
-- name: Install repository Postgresql10
-  yum: name=https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm state=present
+#To use postgresql_user you need to install community.postgresql from ansible-galaxy
+#To install it, use: ansible-galaxy collection install community.postgresql
 
+- name: Install repository Postgresql15
+  yum: 
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    disable_gpg_check: True
+    state: present
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7" 
+  tags: postgres
+
+- name: Install repository Postgresql15
+  dnf: 
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    disable_gpg_check: True
+    state: present
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8" 
+  tags: postgres
+
+- name: Install repository Postgresql15
+  dnf: 
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    disable_gpg_check: True
+    state: present
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9" 
+  tags: postgres
+
+- name: Disable the built-in PostgreSQL module
+  shell: dnf -qy module disable postgresql
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8")
+  tags: postgres
+
+- name: Ensure python2-dnf package is installed
+  package:
+    name: python2-dnf
+    state: present
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7" 
+  tags: postgres
+
+- name: Ensure psycopg2 package is installed (Centos 7)
+  package:
+    name: python2-psycopg2
+    state: present
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "7" 
+  tags: postgres
+
+- name: Ensure psycopg2 package is installed
+  package:
+    name: python3-psycopg2
+    state: present
+  when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "8") or (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  tags: postgres
 
 - name: ensure a list of postgres packages installed
-  yum:
+  dnf:
     name: "{{ packages }}"
   vars:
     packages:
-    - postgresql10-server
-    - postgresql10-contrib
-    - postgresql10
-    - postgresql10-odbc
+    - postgresql15-server
+    - postgresql15-contrib
+    - postgresql15-libs
+    - postgresql15-odbc
+  tags: postgres
 
 - name: enable postgres service
   systemd:
-    name: postgresql-10
+    name: postgresql-15
     enabled: yes
+  tags: postgres
+
+#- name: PostgreSQL check directory exists.
+#  stat:
+#      path: /var/lib/pgsql/15/data/
+#  register: data_postgres_file
+#  tags: postgres
+
+- name: PostgreSQL check file exists.
+  stat:
+      path: /var/lib/pgsql/15/data/postgresql.conf
+  register: data_postgres_file
+  tags: postgres
 
 
-- name: Initiate database
-  #shell: "/usr/pgsql-10/bin/initdb -D /var/lib/pgsql/10/data"  
-  shell: "{{postgresql_bin_path}}/initdb -D {{postgresql_data_dir}}"  
-  become: yes
-  become_user: postgres
-
+- name: Initiate database PostgreSQL
+  shell: /usr/pgsql-15/bin/postgresql-15-setup initdb
+  when: not data_postgres_file.stat.exists
+  tags: postgres
 
 - name: Make sure postgres service is running
   systemd:
     state: started
-    name: postgresql-10
-
+    name: postgresql-15
+  tags: postgres
 
 - name: adding firewall rules for postgres service
   command: firewall-cmd --add-service=postgresql --permanent
@@ -41,7 +102,7 @@
 - name: Configure host based authentication.
   copy:
     src: pg_hba.conf
-    dest: /var/lib/pgsql/10/data/pg_hba.conf
+    dest: /var/lib/pgsql/15/data/pg_hba.conf
     owner: "{{postgresql_user}}"
     group: "{{postgresql_group}}"
     mode: 0600
@@ -51,7 +112,7 @@
 - name: Copy modified postgresql.conf to allow connection from external.
   copy:
     src: postgresql.conf
-    dest: /var/lib/pgsql/10/data/postgresql.conf
+    dest: /var/lib/pgsql/15/data/postgresql.conf
     owner: "{{postgresql_user}}"
     group: "{{postgresql_group}}"
     mode: 0600
@@ -60,5 +121,15 @@
 - name: Restart postgres service
   systemd:
     state: restarted
-    name: postgresql-10
+    name: postgresql-15
+  tags: postgres
+
+- name: Set Password for PostgreSQL user
+  become: true
+  become_method: sudo
+  become_user: postgres
+  postgresql_user: 
+    db: postgres
+    name: postgres
+    password: "postgres"
   tags: postgres
