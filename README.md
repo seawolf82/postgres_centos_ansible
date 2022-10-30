@@ -11,6 +11,11 @@ Tested on:
 - RockyLinux 9
 - Centos 7
 
+Tested on:
+
+2.9 Ansible version
+
+
 To use postgresql_user you need to install community.postgresql from ansible-galaxy
 
 To install it, use: ansible-galaxy collection install community.postgresql
