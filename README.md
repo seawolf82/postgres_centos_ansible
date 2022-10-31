@@ -1,7 +1,7 @@
 # postgres_centos_ansible
 
 
-This script install on postgresql on Redhat based Distributions.
+This script install postgresql on Redhat based Distributions.
 
 Tested on:
 
